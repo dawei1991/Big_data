@@ -2,106 +2,139 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
-public class DataPlotter : MonoBehaviour {
+public class DataPlotter : MonoBehaviour
+{
 
     // Name of the input file, no extension
     public string inputfile;
-    
+
     // List for holding data from CSV reader
     private List<Dictionary<string, object>> pointList;
 
-    // Indices for columns to be assigned
-    public int columnX = 0;
-    public int columnY = 1;
-    public int columnZ = 2;
+    /// <summary>
+    /// Indices for columns to be assigned, For twitter, chose the counts(name) as axis(x), counts(retweet_count) as axis(y), counts(like_count) as axis(z)
+    /// </summary>
 
+    public int columnX;
+    public int columnY;
+    public int columnZ;
     // Full column names
     public string xName;
     public string yName;
     public string zName;
 
-    public float plotScale = 10;
+    public float plotScale;
 
     // The prefab for the data points that will be instantiated
     public GameObject PointPrefab;
+    public GameObject backgraoundImage;
 
     // Object which will contain instantiated prefabs in hiearchy
     public GameObject PointHolder;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
 
         // Set pointlist to results of function Reader with argument inputfile
         pointList = CSVReader.Read(inputfile);
 
+
         //Log to console
-        Debug.Log(pointList);
-
+        //Debug.Log(pointList);
         // Declare list of strings, fill with keys (column names)
-        List<string> columnList = new List<string>(pointList[1].Keys);
-
+        List<string> columnList = new List<string>(pointList[0].Keys);
+        columnList.Add("X");
+        columnList.Add("Y");
+        columnList.Add("Z");
         // Print number of keys (using .count)
-        Debug.Log("There are " + columnList.Count + " columns in the CSV");
+        //Debug.Log("There are " + columnList.Count + " columns in the CSV");
 
-        foreach (string key in columnList)
-            Debug.Log("Column name is " + key);
+        //foreach (string key in columnList)
+        //    Debug.Log("Column name is " + key);
 
         // Assign column name from columnList to Name variables
         xName = columnList[columnX];
         yName = columnList[columnY];
         zName = columnList[columnZ];
 
+        //List<string> nameList = new List<string>();
+        //foreach (Dictionary<string, object> userpoint in pointList)
+        //{
+        //    string name = getUserX(userpoint, xName);
+        //    nameList.Add(name);
+        //}
+
+        // initial the counts of the name
+        //Dictionary<string, float> namedict = new Dictionary<string, float>();
+
+        //foreach (String value in nameList)
+        //{
+        //    if (namedict.ContainsKey(value))
+        //        namedict[value]++;
+        //    else
+        //        namedict[value] = 1;
+        //}
+
+        //foreach (var pair in namedict)
+        //    Debug.Log("Value" + pair.Key + "occurred" + pair.Value+  "times.");
+
+        //GameObject background = Instantiate(backgraoundImage, transform.position, Quaternion.identity);
+
         // Get maxes of each axis
+        //float xMax = namedict.Values.Max();
         float xMax = FindMaxValue(xName);
         float yMax = FindMaxValue(yName);
         float zMax = FindMaxValue(zName);
 
         // Get minimums of each axis
+        //float xMin = namedict.Values.Min();
         float xMin = FindMinValue(xName);
         float yMin = FindMinValue(yName);
         float zMin = FindMinValue(zName);
 
-        
+
         //Loop through Pointlist
         for (var i = 0; i < pointList.Count; i++)
         {
             // Get value in poinList at ith "row", in "column" Name, normalize
-            float x = 
-                (System.Convert.ToSingle(pointList[i][xName]) - xMin) 
+            float x =
+                (System.Convert.ToSingle(pointList[i][xName]) - xMin)
                 / (xMax - xMin);
 
-            float y = 
-                (System.Convert.ToSingle(pointList[i][yName]) - yMin) 
+            float y =
+                (System.Convert.ToSingle(pointList[i][yName]) - yMin)
                 / (yMax - yMin);
 
-            float z = 
-                (System.Convert.ToSingle(pointList[i][zName]) - zMin) 
+            float z =
+                (System.Convert.ToSingle(pointList[i][zName]) - zMin)
                 / (zMax - zMin);
 
 
             // Instantiate as gameobject variable so that it can be manipulated within loop
             GameObject dataPoint = Instantiate(
-                    PointPrefab, 
-                    new Vector3(x, y, z)* plotScale, 
+                    PointPrefab,
+                    new Vector3(x, y, z) * plotScale,
                     Quaternion.identity);
-                       
+
             // Make child of PointHolder object, to keep points within container in hiearchy
             dataPoint.transform.parent = PointHolder.transform;
 
             // Assigns original values to dataPointName
-            string dataPointName = 
-                pointList[i][xName] + " " 
-                + pointList[i][yName] + " " 
+            string dataPointName =
+                pointList[i][xName] + " "
+                + pointList[i][yName] + " "
                 + pointList[i][zName];
 
             // Assigns name to the prefab
             dataPoint.transform.name = dataPointName;
 
             // Gets material color and sets it to a new RGB color we define
-            dataPoint.GetComponent<Renderer>().material.color = 
-                new Color(x,y,z, 1.0f);
-        }       
+            dataPoint.GetComponent<Renderer>().material.color =
+                new Color(x, y, z, 1.0f);
+        }
 
     }
 
@@ -136,4 +169,26 @@ public class DataPlotter : MonoBehaviour {
         return minValue;
     }
 
+
+    private string getUserX(Dictionary<string, object> user, String columName)
+
+    {
+        string initialName = Convert.ToString(user[columName]);
+        return initialName;
+    }
+
+
+    private string getUserY(Dictionary<string, object> user, String columName)
+
+    {
+        string initialName = Convert.ToString(user[columName]);
+        return initialName;
+    }
+
+    private string getUserZ(Dictionary<string, object> user, String columName)
+
+    {
+        string initialName = Convert.ToString(user[columName]);
+        return initialName;
+    }
 }

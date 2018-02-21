@@ -11,13 +11,15 @@ using System.Text.RegularExpressions;
 
 public class CSVReader
 {
-    static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))"; // Define delimiters, regular expression craziness
-    static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r"; // Define line delimiters, regular experession craziness
-    static char[] TRIM_CHARS = { '\"' };
+    //private static string SPLIT_RE = ","; // Define delimiters, regular expression craziness
+    //private static string SPLIT_RE_Column = "\""; // Define delimiters, regular expression craziness
+    private static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))"; // Define delimiters, regular expression craziness
+    private static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r"; // Define line delimiters, regular experession craziness
+    private static char[] TRIM_CHARS = { '\"' };
 
     public static List<Dictionary<string, object>> Read(string file) //Declare method
     {
-        //Debug.Log("CSVReader is reading " + file); // Print filename, make sure parsed correctly
+        Debug.Log("CSVReader is reading " + file); // Print filename, make sure parsed correctly
 
         var list = new List<Dictionary<string, object>>(); //declare dictionary list
 
@@ -36,7 +38,7 @@ public class CSVReader
         {
 
             var values = Regex.Split(lines[i], SPLIT_RE); //Split lines according to SPLIT_RE, store in var (usually string array)
-            if (values.Length == 0 || values[0] == "") continue; // Skip to end of loop (continue) if value is 0 length OR first value is empty
+			if (values.Length == 0 || values[0] == "") continue; // Skip to end of loop (continue) if value is 0 length OR first value is empty
 
             var entry = new Dictionary<string, object>(); // Creates dictionary object
 
@@ -44,6 +46,7 @@ public class CSVReader
             for (var j = 0; j < header.Length && j < values.Length; j++)
             {
                 string value = values[j]; // Set local variable value
+
                 value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", ""); // Trim characters
                 object finalvalue = value; //set final value
 
